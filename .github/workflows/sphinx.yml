@@ -1,0 +1,26 @@
+name: "Sphinx: Render docs"
+
+on: push  # 在每次推送时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 在 Ubuntu 最新版本的虚拟环境中运行
+
+    permissions:
+      contents: write  # 设置权限，允许写入内容
+
+    steps:
+    - uses: actions/checkout@v4  # 检出代码库的代码
+    - name: Build HTML
+      uses: ammaraskar/sphinx-action@master  # 使用 Sphinx Action 来构建文档
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4  # 上传构建的文档
+      with:
+        name: html-docs  # 上传的 artifact 名称
+        path: docs/build/html/  # 文档的路径
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3  # 部署到 GitHub Pages
+      if: github.ref == 'refs/heads/main'  # 仅在 main 分支上部署
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub 提供的 token
+        publish_dir: docs/build/html  # 发布的目录
